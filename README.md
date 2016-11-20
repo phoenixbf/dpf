@@ -1,6 +1,8 @@
 ## DPF js Library
 
-**Depth Panoramic Frame** is an omnidirectional data transport for panoramic media, conceived for VR. It targets modern browsers, (multi)-touch devices and VR dissemination (WebVR), suitable for online and local contexts. It offers full sense of presence and scale within VR fruition by restoring a 3D space without transmitting original dataset (e.g.: very large point-clouds) using instead an egocentric optimized encoding.
+**Depth Panoramic Frame** is an omnidirectional data transport for panoramic media, conceived for VR. It targets modern browsers, (multi)-touch devices and VR dissemination (WebVR), suitable for online and local contexts. It offers full sense of presence and scale within VR fruition by restoring a 3D space without transmitting original dataset (e.g.: very large point-clouds) using instead an egocentric optimized encoding. It was researched and developed at VHLab, CNR ITABC (Rome, IT).
+
+When using the library (or just for more details) please link [full paper](https://diglib.eg.org/handle/10.2312/gch20161380) presented in [EuroGraphics GCH 2016](http://gch2016.ge.imati.cnr.it/) - Genoa (IT).
 
 The DPF data transport provides:
 * Correct VR stereoscopic fruition, by restoring a 3D virtual space on the fly
@@ -11,14 +13,16 @@ The DPF data transport provides:
 * Easy deployment on a webpage
 * Easy integration with external devices
 
-When using the library (or just for more details) please link [full paper](https://diglib.eg.org/handle/10.2312/gch20161380) presented in [EuroGraphics GCH 2016](http://gch2016.ge.imati.cnr.it/) - Genoa (IT).
-
 ## Dependencies
 
 * [jQuery](https://jquery.com/) - jQuery
 * [Bluebird](http://bluebirdjs.com/docs/getting-started.html) - Bluebird
 * [Hammer](http://hammerjs.github.io/) - Hammer js (multi-touch support)
 * [OSG.js](http://osgjs.org/) - OSG js
+
+## API
+
+You can find the full API documentation [here](http://osiris.itabc.cnr.it/API/dpf/)
 
 ## Getting Started
 
