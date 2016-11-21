@@ -1,6 +1,6 @@
 ## DPF js Library
 
-**Depth Panoramic Frame** is an omnidirectional data transport for panoramic media, conceived for VR. It targets modern browsers, (multi)-touch devices and VR dissemination (WebVR), suitable for online and local contexts. It offers full sense of presence and scale within VR fruition by restoring a 3D space without transmitting original dataset (e.g.: very large point-clouds) using instead an egocentric optimized encoding. It was researched and developed at VHLab, CNR ITABC (Rome, IT).
+**Depth Panoramic Frame** is an omnidirectional data transport for panoramic media, conceived for VR. It targets modern browsers, (multi)-touch devices and VR dissemination (WebVR), suitable for online and local contexts. It offers full sense of presence and scale within VR fruition by restoring a 3D space without transmitting original dataset (e.g.: very large point-clouds) using instead an egocentric optimized encoding.
 
 When using the library (or just for more details) please link [full paper](https://diglib.eg.org/handle/10.2312/gch20161380) presented in [EuroGraphics GCH 2016](http://gch2016.ge.imati.cnr.it/) - Genoa (IT).
 
@@ -22,11 +22,11 @@ The DPF data transport provides:
 
 ## API
 
-You can find the full API documentation [here](http://osiris.itabc.cnr.it/API/dpf/)
+You can find the full and updated API documentation [here](http://osiris.itabc.cnr.it/API/dpf/)
 
 ## Getting Started
 
-To include DPF.js library and its functionalities in your web page, you just need to add DPF.js library in your HTML head, along with its dependencies. For instance if you place all *.js in "js/" subfolder, your would have something like this (with "DPF.min.js" at the end):
+You'll find full HTML examples in **examples** folder to play with. First off, to include DPF.js library and its functionalities in your web page, you just need to add DPF.js library in your HTML head, along with its dependencies. For instance if you place all *.js in "js/" subfolder, your would have something like this (with DPF library as last):
 
 ```xml
 <head>
@@ -40,7 +40,7 @@ To include DPF.js library and its functionalities in your web page, you just nee
 
 ## Basic Samples
 
-First, in your HTML page you may setup something like this:
+In general, you may setup something like this for your HTML page:
 
 ```javascript
 window.addEventListener( 'load', function () {
@@ -60,7 +60,7 @@ window.addEventListener( 'load', function () {
 });
 ```
 
-The above may serve as blueprint for all DPF-based web applications.
+The above will setup a basic DPF handler attached to a canvas element 'View': it may serve as blueprint for all DPF-based web applications.
 
 ### Loading the base channel
 
@@ -106,4 +106,4 @@ One line! quite easy!
 
 ## Disclaimer
 
-When using this js library, please insert a reference to official page and/or original [paper](https://diglib.eg.org/handle/10.2312/gch20161380).
+When using this js library, please insert a reference to official page and/or original [paper](https://diglib.eg.org/handle/10.2312/gch20161380). This project is being researched and developed at VHLab, CNR ITABC (Rome, IT).
