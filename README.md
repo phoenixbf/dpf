@@ -44,19 +44,19 @@ In general, you may setup something like this for your HTML page:
 
 ```javascript
 window.addEventListener( 'load', function () {
-	// First we get our canvas element
+	// First we grab our canvas element
 	var canvas = document.getElementById( 'View' );
 
 	// Create our DPF handler and attach to canvas element
-	var myDPFexplorer = new DPFhandler( canvas );
+	var myExplorer = new DPFhandler( canvas );
 
 	// Load GLSL resources from folder
-	myDPFexplorer.loadShadersFromPath("my/shaders/folder");
+	myExplorer.loadShadersFromPath("my/shaders/folder");
 	
 	// ...Loading and setup of DPF stuff goes here...
 
 	// Run it!
-	myDPFexplorer.run();
+	myExplorer.run();
 });
 ```
 
@@ -70,13 +70,13 @@ Basic example to setup a single DPF and loading the base panoramic data (color) 
 var myDPF = new DPF();
 myDPF.requestPano("url/of/my/pano"); // request simple pano (e.g. "pano1.jpg")
 
-myDPFexplorer.addDPF( myDPF );
+myExplorer.addDPF( myDPF );
 ```
 
 or in a shorter, compact form:
 
 ```javascript
-myDPFexplorer.addDPF( new DPF("url/of/my/pano") );
+myExplorer.addDPF( new DPF("url/of/my/pano") );
 ```
 
 Both the above examples create a new DPF object, request color data (image or video-stream) and add it to the handler.
@@ -93,13 +93,13 @@ var myDPF = new DPF(
 
 myDPF.setDepthRange(1.5, 18.0); // Sample [min,max] range
 
-myDPFexplorer.addDPF( myDPF );
+myExplorer.addDPF( myDPF );
 ```
 
 Although, in general you won't need to explicitly set ranges or paths by yourself (especially when dealing with multiple DPFs!), but rather load the XML descriptor produced by the **dpfEncoder** tool:
 
 ```javascript
-myDPFexplorer.parseXML('url/of/my/DPFdescriptor.xml');
+myExplorer.parseXML('url/of/my/DPFdescriptor.xml');
 ```
 
 One line! quite easy!
