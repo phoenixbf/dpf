@@ -1,4 +1,10 @@
 
+#define DPF_ANN_HASH	0.3 //0.3
+
+#define DPF_RAD_SCALE	100.0
+
+#define DPF_ANN_H		128.0
+precision mediump float;precision mediump int;varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;uniform sampler2D panoTex;uniform sampler2D depthTex;uniform sampler2D annTex;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
 #ifdef DPF_USE_UNIFIED
 
 #define DPF_H_COLOR		0.5
@@ -16,7 +22,7 @@ vec2 a(vec2 b){vec2 c;c.x=b.x;c.y=(b.y*DPF_H_COLOR)+DPF_OFFS_COLOR;return c;}vec
 #endif
 
 #ifdef VERTEX_SH
-precision mediump float;precision mediump int;attribute vec3 Normal;attribute vec3 Vertex;attribute vec2 TexCoord0;attribute vec2 TexCoord1;attribute vec2 TexCoord2;varying vec2 osg_TexCoord0;varying vec2 osg_TexCoord1;varying vec2 osg_TexCoord2;varying vec3 osg_FragVertex;uniform mat4 uModelViewNormalMatrix;uniform mat4 uProjectionMatrix;uniform mat4 uModelViewMatrix;uniform sampler2D panoTex;uniform sampler2D depthTex;uniform sampler2D annTex;uniform float minRad;uniform float maxRad;uniform float radMult;uniform float time;uniform int bQuadratic;uniform int bInvertDM;uniform int bActive;uniform int bUseComboUnit;float f(){float g;
+attribute vec3 Normal;attribute vec3 Vertex;attribute vec2 TexCoord0,TexCoord1,TexCoord2;uniform mat4 uModelViewNormalMatrix;uniform mat4 uProjectionMatrix;uniform mat4 uModelViewMatrix;uniform float radMult;float f(){float g;
 #ifdef DPF_MOBILE_DEVICE
 g=maxRad;
 #else
@@ -31,13 +37,7 @@ return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord
 #endif
 
 #ifdef FRAGMENT_SH
-
-#define DPF_ANN_HASH	0.3 //0.3
-
-#define DPF_RAD_SCALE	100.0
-
-#define DPF_ANN_H		128.0
-precision mediump float;precision mediump int;varying vec2 osg_TexCoord0;varying vec2 osg_TexCoord1;varying vec2 osg_TexCoord2;varying vec3 osg_FragVertex;uniform sampler2D panoTex;uniform sampler2D depthTex;uniform sampler2D annTex;uniform float slopeDiscard;uniform float time;uniform vec3 camPos;uniform vec3 panoPos;uniform float minRad;uniform float maxRad;uniform float visibility;uniform vec2 DOF;uniform int annotationHash;uniform int numAnnotations;uniform float annotationWidth;uniform int bActive;uniform int bAnnotationVision;uniform int bDepthVision;float j(){
+uniform float slopeDiscard;uniform vec3 camPos;uniform vec3 panoPos;uniform float visibility;uniform vec2 DOF;uniform int annotationHash;float j(){
 #ifdef DPF_USE_UNIFIED
 return texture2D(panoTex,e(osg_TexCoord0)).g;
 #else

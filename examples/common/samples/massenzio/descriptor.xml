@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dpfnetwork>
+	<postfix color=".jpg" depth="-d.png" annotation="-a.png" />
+
+	<DPF>
+		<name>01</name>
+		<depthrange min="1.65904" max="17.4762" />
+		<position x="0.14446" y="47.47731" z="0.05160" />
+		<orientation x="0.0" y="0.0" z="4.77232" />
+	</DPF>
+
+	<DPF>
+		<name>02</name>
+		<depthrange min="1.58745" max="18.2057" />
+		<position x="-5.51362" y="45.38706" z="0.02457" />
+		<orientation x="0.0" y="0.0" z="5.52351" />
+	</DPF>
+
+</dpfnetwork>
