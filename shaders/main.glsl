@@ -55,14 +55,14 @@ t=l(s,e(osg_TexCoord2));
 #else
 t=l(s,osg_TexCoord2);
 #endif
-if(t==0) return vec4(0,0,0,1);vec4 u;float v=(sin(time*2.0)+1.0);v*=0.5;u=mix(vec4(0,1,0,1),vec4(0,0,1,1),v);return u;}void main(void){vec4 w;float x=(maxRad-minRad)*DPF_RAD_SCALE;float y=(gl_FragCoord.z/gl_FragCoord.w);float z=y/x;float A=DOF.y-y;A=abs(A);if(DOF.y<0.2) A=0.0;float B=clamp((A*DOF.x),0.0,5.0);
+if(t==0) return vec4(0,0,0,1);vec4 u;float v=(sin(time*2.0)+1.0);v*=0.5;u=mix(vec4(0,1,0,1),vec4(0,0,1,1),v);return u;}void main(void){vec4 w;float x=(maxRad-minRad)*DPF_RAD_SCALE;float y=(gl_FragCoord.z/gl_FragCoord.w);float z=y/x;
 #ifdef DPF_USE_UNIFIED
 w=texture2D(panoTex,a(osg_TexCoord0));
 #else
 #ifdef DPF_MOBILE_DEVICE
 w=texture2D(panoTex,osg_TexCoord0);
 #else
-if(DOF.x<=0.0) w=texture2D(panoTex,osg_TexCoord0);else w=texture2D(panoTex,osg_TexCoord0,B);
+float A=DOF.y-y;A=abs(A);if(DOF.y<0.2) A=0.0;float B=clamp((A*DOF.x),0.0,5.0);if(DOF.x<=0.0) w=texture2D(panoTex,osg_TexCoord0);else w=texture2D(panoTex,osg_TexCoord0,B);
 #endif
 #endif
 if(bAnnotationVision>0){float C=j();float D=0.0;if(C>0.0) D=0.5;w=vec4(C,(1.0-z),D,1);}if(bDepthVision>0){w=texture2D(depthTex,osg_TexCoord1.xy);float z=(y-minRad)/x;w.g=1.0-z;}float E;

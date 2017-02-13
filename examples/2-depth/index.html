@@ -24,11 +24,20 @@
         var myExplorer = new DPFhandler( canvas );
         myExplorer.loadShadersFromPath("../../shaders");
 
-        // We create a DPF and add a simple panorama (color channel)
-        myExplorer.addDPF( new DPF("../common/samples/petra/06.jpg") );
+        // We create a DPF
+        var myDPF = new DPF();
+
+        // We request a base color and its encoded egocentric depth
+        myDPF.requestColor("../common/samples/massenzio/01.jpg");
+        myDPF.requestDepth("../common/samples/massenzio/01-d.png");
+
+        // We specify the depth range (min,max) in meters
+        myDPF.setDepthRange(1.65904, 17.4762);
 
         // We set a FOV
         myExplorer.setFOV(70.0);
+
+        myExplorer.addDPF( myDPF );
 
         // OK Let's go !!
         myExplorer.run();
@@ -47,9 +56,10 @@
     <!--  Bottom description  -->
     <div class="infoContainer">
         <div class="description" >
-        <div class="title">Basic</div>
+        <div class="title">Color and Depth</div>
         <div class="sampleText">
-        A very basic setup: a simple DPF container is created and a <a target="_blank" href="../common/samples/petra/06.jpg">base color equirectangular</a> is requested. This kind of setup corresponds to common panoramas we are used to explore online. In this demo we also set a 70 degrees Field-of-View by using <div class="code">myExplorer.setFOV()</div> - use '+' and '-' to change FOV at runtime.
+        In this example we create a DPF container, then we request: <b>Base color</b> <div class="code">myDPF.requestColor()</div> and <b>Egocentric depth</b> <div class="code">myDPF.requestDepth()</div><br>
+        We specify a depth range (this is computed automatically by <b>egoDepth</b> tool) in order to restore a 3D space approximation with correct scale, entirely on GPU. Note the egocentric depth has a special encoding, optimized for size and perception - see <a href="https://diglib.eg.org/handle/10.2312/gch20161380">reference paper</a>. Feel free to explore the 3D space using arrows or A,S,D,W keys. Use space to go back home or DPF origin (in this case: 0,0,0).
         </div>
         </div>
     </div>

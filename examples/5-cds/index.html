@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+<title>DPF Example</title>
+<link rel="stylesheet" type="text/css" href="../../css/dpf.css">
+
+<script type="text/javascript" src="../common/vendors/jquery.min.js"></script>
+<script type="text/javascript" src="../common/vendors/bluebird.min.js"></script>
+<script type="text/javascript" src="../common/vendors/hammer.min.js"></script>
+<script type="text/javascript" src="../common/vendors/OSG.min.js"></script>
+<script type="text/javascript" src="../../dist/DPF.min.js"></script>
+
+<!--  Our basic setup  -->
+<script>
+    window.addEventListener( 'load', function () {
+        // First we grab canvas element
+        var canvas = document.getElementById( 'View' );
+
+        // We create a DPF explorer and attach to our canvas
+        var myExplorer = new DPFhandler( canvas );
+        myExplorer.loadShadersFromPath("../../shaders");
+
+        // We create a DPF
+        var myDPF = new DPF();
+
+        // We request a base color and its encoded semantic layer
+        myDPF.requestColor("../common/samples/massenzio/01.jpg");
+        myDPF.requestDepth("../common/samples/massenzio/01-d.png");
+        myDPF.requestSemantic("../common/samples/massenzio/01-a.png");
+
+        // We specify the depth range (min,max) in meters
+        myDPF.setDepthRange(1.65904, 17.4762);
+
+        // We set a FOV
+        myExplorer.setFOV(70.0);
+
+        myExplorer.addDPF( myDPF );
+
+
+        //========================================================
+        // We define our annotation events handling
+        //========================================================
+
+        // First, grab element that we'll modify
+        var annotationElement = document.getElementById( 'annID' );
+
+        // A simple function to change our text in such element
+        var setText = function(text){ annotationElement.innerHTML = text; };
+
+        // A sample sound we intend to play on hover
+        var hoverAudio  = new Audio("../common/samples/audio/click.ogg");
+        hoverAudio.loop = false;
+        var playHoverSound = function(){ hoverAudio.play(); };
+
+
+        // A simple AudioList we intend to use for each annotation selection
+        var audioList = {};
+        audioList.acquisition = new Audio("../common/samples/audio/acquisition.mp3");
+        audioList.acquisition.loop = false;
+
+        audioList.niches = new Audio("../common/samples/audio/niches.mp3");
+        audioList.niches.loop = false;
+
+        audioList.markers = new Audio("../common/samples/audio/markers.mp3");
+        audioList.markers.loop = false;
+
+        var playSound = function(soundName){
+            if (audioList[soundName]) audioList[soundName].play();
+            };
+
+
+
+        // This is called whenever we hover a new annotation ID.
+        // Very useful to define a generic event (e.g. sound) on ANY annotation hover
+        myExplorer.onHoverAnnotation = function(){
+            var aID = this.getHoveredAnnotationID();
+
+            playHoverSound();   // play hover sound
+
+            //setText("Annotation #"+aID);
+            console.log("Hovering annotation #" + aID);
+            };
+
+        // ...and when we leave
+        myExplorer.onLeaveAnnotation = function(){
+
+            setText("");
+            console.log("No annotation hovered");
+            };
+
+        // Annotation Registration
+        //========================
+        // onHoverAnnotation( <ID>, function )
+        // For each annotation hash (ID) we define specific hover function: in this case, simply change the text
+        myDPF.onHoverAnnotation(1, function(){ setText("Acquisition"); });
+        myDPF.onHoverAnnotation(3, function(){ setText("Entry"); });
+        myDPF.onHoverAnnotation(4, function(){ setText("Niches"); });
+        myDPF.onHoverAnnotation(6, function(){ setText("Markers"); });
+        myDPF.onHoverAnnotation(7, function(){ setText("CLICK to EXIT"); });
+
+        // onSelectAnnotation( <ID>, function )
+        // For each annotation hash (ID) we define specific functions for onSelect
+        // In this case, we play a sound and in one annotated area we manipulate URL!
+        myDPF.onSelectAnnotation(1, function(){ playSound("acquisition"); });
+        myDPF.onSelectAnnotation(4, function(){ playSound("niches"); });
+        myDPF.onSelectAnnotation(6, function(){ playSound("markers"); });
+        myDPF.onSelectAnnotation(7, function(){ window.location.href = "../"; });
+
+
+        // OK Let's go !!
+        myExplorer.run();
+        });
+</script>
+</head>
+
+
+<body class="dark-bg">
+
+	<!-- Our 3D View -->
+	<div id="ViewContainer" class="view3D">
+	<canvas id="View" oncontextmenu="return false;"></canvas>
+	</div>
+
+    <!--  Bottom description  -->
+    <div class="infoContainer" style="pointer-events:none !important;">
+        <div class="description" >
+        <div class="title"><span id="annID"></span> | Color + Depth + Semantic</div>
+        <div class="sampleText">
+        In this example we request Color, Depth and Semantic maps. Note how hover and pointing is consistent with the deformed 3D space. For each annotation we define onHover functions to change text, then we add selection handling <div class="code">myDPF.onSelectAnnotation(id, onSelect)</div> to play a sound (you can test it by clicking on some annotated area). We also set a specific area to trigger URL manipulation to go back samples main page (look for EXIT annotated room).
+        </div>
+        </div>
+    </div>
+
+</body>
+</html>
