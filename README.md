@@ -4,12 +4,15 @@
 
 When using the library (or just for more details) please link [full paper](https://diglib.eg.org/handle/10.2312/gch20161380) presented in [EuroGraphics GCH 2016](http://gch2016.ge.imati.cnr.it/) - Genoa (IT).
 
-The DPF data transport provides:
+The DPF data transport and DPF Library provide:
 * Correct VR stereoscopic fruition, by restoring a 3D virtual space on the fly
 * Encoding/Decoding of omnidirectional data, Semantic queries and 3D Restoration are all GPU-based
 * Streaming of compact and optimized image-based data (no geometry)
-* Support to video-streams
-* Easy event handling on semantically enriched areas
+* Optimal detail for HMDs, minimizing data transmission
+* Fast and easy semantic enrichment by non-professional users
+* Support for video-streams
+* Support for real-time Depth-of-Field effects
+* Easy event handling on semantically enriched areas (see examples)
 * Easy deployment on a webpage
 * Easy integration with external devices
 
