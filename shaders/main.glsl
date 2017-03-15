@@ -4,7 +4,11 @@
 #define DPF_RAD_SCALE	100.0
 
 #define DPF_ANN_H		128.0
-precision mediump float;precision mediump int;varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;uniform sampler2D panoTex;uniform sampler2D depthTex;uniform sampler2D annTex;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
+
+#ifdef GL_ES
+precision mediump float;precision mediump int;
+#endif
+varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;uniform sampler2D panoTex;uniform sampler2D depthTex;uniform sampler2D annTex;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
 #ifdef DPF_USE_UNIFIED
 
 #define DPF_H_COLOR		0.5
@@ -22,7 +26,7 @@ vec2 a(vec2 b){vec2 c;c.x=b.x;c.y=(b.y*DPF_H_COLOR)+DPF_OFFS_COLOR;return c;}vec
 #endif
 
 #ifdef VERTEX_SH
-attribute vec3 Normal;attribute vec3 Vertex;attribute vec2 TexCoord0,TexCoord1,TexCoord2;uniform mat4 uModelViewNormalMatrix;uniform mat4 uProjectionMatrix;uniform mat4 uModelViewMatrix;uniform float radMult;float f(){float g;
+attribute vec3 Normal;attribute vec3 Vertex;attribute vec2 TexCoord0;uniform mat3 uModelViewNormalMatrix;uniform mat4 uProjectionMatrix;uniform mat4 uModelViewMatrix;uniform float radMult;float f(){float g;
 #ifdef DPF_MOBILE_DEVICE
 g=maxRad;
 #else
@@ -33,7 +37,7 @@ g=texture2D(depthTex,osg_TexCoord1).b;
 #endif
 g*=radMult;if(bInvertDM>0) g=1.0-g;if(bQuadratic>0){if(bQuadratic==1) g=sqrt(g);else g*=g;}g=mix(maxRad,minRad,g);
 #endif
-return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord1=TexCoord0;osg_TexCoord2=TexCoord0;vec3 h=normalize(Normal);vec4 i=vec4(Vertex,1.0);i.xyz=(h*f());h=vec3(uModelViewNormalMatrix*vec4(Normal,1.0));i=uModelViewMatrix*i;gl_Position=uProjectionMatrix*i;}
+return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord1=TexCoord0;osg_TexCoord2=TexCoord0;vec3 h=normalize(Normal);vec4 i=vec4(Vertex,1.0);i.xyz=(h*f());h=vec3(uModelViewNormalMatrix*Normal);i=uModelViewMatrix*i;gl_Position=uProjectionMatrix*i;}
 #endif
 
 #ifdef FRAGMENT_SH

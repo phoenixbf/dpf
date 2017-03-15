@@ -35,6 +35,13 @@ canvas {
     -webkit-user-select: none;
     -o-user-select: none;
     user-select: none;
+/*
+    -webkit-filter: blur(2px);
+    -moz-filter: blur(2px);
+    -ms-filter: blur(2px);
+    -o-filter: blur(2px);
+    filter: blur(2px);
+*/
 }
 
 .view3D {
@@ -140,4 +147,12 @@ canvas {
     background: rgba(0,0,0, 0.5);
 
     /*pointer-events: auto;*/
+}
+
+.description::after {
+  /* Prefix free isn't picking up this one */
+  -webkit-filter: url('#blur');
+  filter: url('#blur');
+  -webkit-filter: blur(5px);
+  filter: blur(5px);
 }
