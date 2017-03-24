@@ -35,6 +35,10 @@ canvas {
     -webkit-user-select: none;
     -o-user-select: none;
     user-select: none;
+
+    cursor: default;
+    cursor: -moz-default;
+    cursor: -webkit-default;
 /*
     -webkit-filter: blur(2px);
     -moz-filter: blur(2px);
@@ -150,9 +154,9 @@ canvas {
 }
 
 .description::after {
-  /* Prefix free isn't picking up this one */
-  -webkit-filter: url('#blur');
-  filter: url('#blur');
-  -webkit-filter: blur(5px);
-  filter: blur(5px);
+    /* Prefix free isn't picking up this one */
+    -webkit-filter: url('#blur');
+    filter: url('#blur');
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
 }
