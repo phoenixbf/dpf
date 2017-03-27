@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dpfcontainer>
+	<postfix color=".jpg" depth="-d.png" annotation="-a.png" />
+	<DPF>
+		<name>pano1</name>
+		<depthrange min="2.64849234" max="30.01699829" />
+		<position x="5.84469255" y="25.55952194" z="-1.99328331" />
+		<orientation x="0.00650204" y="0.02035299" z="1.56527207" />
+	</DPF>
+
+	<DPF>
+		<name>pano2</name>
+		<depthrange min="2.59776783" max="31.38521385" />
+		<position x="5.87051675" y="12.67597445" z="-2.04531638" />
+		<orientation x="0.00039159" y="0.00674983" z="1.56433946" />
+	</DPF>
+
+	<DPF>
+		<name>pano3</name>
+		<depthrange min="2.64932275" max="38.87640381" />
+		<position x="5.90425822" y="4.26949389" z="-1.99344344" />
+		<orientation x="0.00824337" y="0.00591648" z="1.57199478" />
+	</DPF>
+
+	<DPF>
+		<name>pano4</name>
+		<depthrange min="2.78004122" max="35.38668060" />
+		<position x="5.88403426" y="31.57753601" z="-1.86365118" />
+		<orientation x="0.00128839" y="0.00285560" z="1.56132662" />
+	</DPF>
+
+</dpfcontainer>
