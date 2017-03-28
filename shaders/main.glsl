@@ -37,7 +37,7 @@ g=texture2D(depthTex,osg_TexCoord1).b;
 #endif
 g*=radMult;if(bInvertDM>0) g=1.0-g;if(bQuadratic>0){if(bQuadratic==1) g=sqrt(g);else g*=g;}g=mix(maxRad,minRad,g);
 #endif
-return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord1=TexCoord0;osg_TexCoord2=TexCoord0;vec3 h=normalize(Normal);vec4 i=vec4(Vertex,1.0);i.xyz=(h*f());h=vec3(uModelViewNormalMatrix*Normal);i=uModelViewMatrix*i;gl_Position=uProjectionMatrix*i;}
+return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord1=TexCoord0;osg_TexCoord2=TexCoord0;vec3 h=normalize(Normal);vec4 i=vec4(Vertex,1.0);i.xyz=(h*f());h=uModelViewNormalMatrix*Normal;i=uModelViewMatrix*i;gl_Position=uProjectionMatrix*i;}
 #endif
 
 #ifdef FRAGMENT_SH
@@ -69,11 +69,11 @@ J=texture2D(panoTex,osg_TexCoord0);
 float N=DOF.y-L;N=abs(N);if(DOF.y<0.2) N=0.0;float O=clamp((N*DOF.x),0.0,5.0);if(DOF.x<=0.0) J=texture2D(panoTex,osg_TexCoord0);else J=texture2D(panoTex,osg_TexCoord0,O);
 #endif
 #endif
-float P=j();if(bAnnotationVision>0){float Q=0.0;if(P>0.0) Q=0.5;J=vec4(P,(1.0-M),Q,1);}if(bDepthVision>0){J=texture2D(depthTex,osg_TexCoord1.xy);float M=(L-minRad)/K;J.g=1.0-M;}float R;
+float P=j();if(bAnnotationVision>0){float Q=0.0;if(P>0.0) Q=0.5;J=vec4(P,(1.0-M),Q,1);}if(bDepthVision>0){J=texture2D(depthTex,osg_TexCoord1.xy);float R=(L-minRad)/K;J.g=1.0-R;}float S;
 #ifdef DPF_USE_UNIFIED
-R=texture2D(panoTex,d(osg_TexCoord1)).r;
+S=texture2D(panoTex,d(osg_TexCoord1)).r;
 #else
-R=texture2D(depthTex,osg_TexCoord1).r;
+S=texture2D(depthTex,osg_TexCoord1).r;
 #endif
-float t=1.0-R;if(t>=slopeDiscard) t=1.0;else discard;if(visibility<=0.0) discard;if(bAnnotationVision==0){float S=float(annotationHash);vec4 T=E(S);J+=(0.2*T);float U=min(dimColor.a,1.0-T.a);J=mix(J,dimColor,U);}J.a=visibility*t;gl_FragColor=J;}
+float t=1.0-S;if(t>=slopeDiscard) t=1.0;else discard;if(visibility<=0.0) discard;if(bAnnotationVision==0){float T=float(annotationHash);vec4 U=E(T);J+=(0.2*U);float V=min(dimColor.a,1.0-U.a);J=mix(J,dimColor,V);}J.a=visibility*t;gl_FragColor=J;}
 #endif
