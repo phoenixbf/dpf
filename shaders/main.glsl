@@ -41,7 +41,7 @@ return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord
 #endif
 
 #ifdef FRAGMENT_SH
-uniform float slopeDiscard;uniform float visibility;uniform vec2 DOF;uniform vec4 dimColor;uniform int annotationHash;float i(){
+uniform float slopeDiscard;uniform float visibility;uniform vec2 DOF;uniform vec4 dimColor;uniform vec4 annActiveColor;uniform int annotationHash;float i(){
 #ifdef DPF_USE_UNIFIED
 return texture2D(panoTex,e(osg_TexCoord0)).g;
 #else
@@ -53,27 +53,27 @@ return texture2D(panoTex,j).g;
 #else
 return texture2D(annTex,j).g;
 #endif
-}vec4 k(float l){float m=6.0;float n=mod(l,m);int o=int(n);float p=0.2;if(o==0) return vec4(p,p,1.0,1.0);if(o==1) return vec4(p,1.0,p,1.0);if(o==2) return vec4(1.0,p,p,1.0);if(o==3) return vec4(p,1.0,1.0,1.0);if(o==4) return vec4(1.0,1.0,p,1.0);if(o==5) return vec4(1.0,p,1.0,1.0);}vec3 q(vec3 r,float s){const vec3 t=vec3(0.2125,0.7154,0.0721);vec3 u=vec3(dot(r,t));return mix(u,r,s);}vec3 v(vec3 r,float w){return ((r-0.5)*w)+0.5;}int x(float y,vec2 j){if(y<=DPF_ANN_HASH) return 0;float z=i(j);if(z==0.0) return 0;float A=(z*255.0)*DPF_ANN_HASH;float B=floor(y);float C=floor(A);if(abs(B-C)>0.0) return 0;return 1;}vec4 D(float E){int F;
+}vec4 k(float l){float m=6.0;float n=mod(l,m);int o=int(n);float p=0.2;if(o==0) return vec4(p,p,1.0,1.0);if(o==1) return vec4(p,1.0,p,1.0);if(o==2) return vec4(1.0,p,p,1.0);if(o==3) return vec4(p,1.0,1.0,1.0);if(o==4) return vec4(1.0,1.0,p,1.0);if(o==5) return vec4(1.0,p,1.0,1.0);}vec3 q(vec3 r,float s){const vec3 t=vec3(0.2125,0.7154,0.0721);vec3 u=vec3(dot(r,t));return mix(u,r,s);}vec3 v(vec3 r,float w){return ((r-0.5)*w)+0.5;}int x(float y,vec2 j){if(y<=DPF_ANN_HASH) return 0;float z=i(j);if(z==0.0) return 0;float A=(z*255.0)*DPF_ANN_HASH;float B=floor(y);float C=floor(A);if(abs(B-C)>0.0) return 0;return 1;}vec4 D(float E){int F;float G=0.0;vec4 H=vec4(0,0,0,0);
 #ifdef DPF_USE_UNIFIED
-F=x(E,e(osg_TexCoord2));
+F=x(E,e(osg_TexCoord2));G=texture2D(annTex,e(osg_TexCoord2)).r;
 #else
-F=x(E,osg_TexCoord2);
+F=x(E,osg_TexCoord2);G=texture2D(annTex,osg_TexCoord2).r;
 #endif
-if(F==0) return vec4(0,0,0,0);vec4 G;float H=(sin(time*8.0)+1.0);H*=0.5;G=vec4(0.2,1.0,0.2,1.0);G=mix(G*0.3,G*0.8,H);return G;}void main(void){vec4 I;float J=(maxRad-minRad)*DPF_RAD_SCALE;float K=(gl_FragCoord.z/gl_FragCoord.w);float L=K/J;
+float I=(0.3*sin(time*2.0));if(F==0){if(G>0.0) H+=I;return H;}float J=(sin(time*8.0)+1.0);J*=0.5;H=annActiveColor;H=mix(H*0.3,H*0.8,J);return H;}void main(void){vec4 K;float L=(maxRad-minRad)*DPF_RAD_SCALE;float M=(gl_FragCoord.z/gl_FragCoord.w);float N=M/L;
 #ifdef DPF_USE_UNIFIED
-I=texture2D(panoTex,a(osg_TexCoord0));
+K=texture2D(panoTex,a(osg_TexCoord0));
 #else
 #ifdef DPF_MOBILE_DEVICE
-I=texture2D(panoTex,osg_TexCoord0);
+K=texture2D(panoTex,osg_TexCoord0);
 #else
-float M=DOF.y-K;M=abs(M);if(DOF.y<0.2) M=0.0;float N=clamp((M*DOF.x),0.0,5.0);if(DOF.x<=0.0) I=texture2D(panoTex,osg_TexCoord0);else I=texture2D(panoTex,osg_TexCoord0,N);
+float O=DOF.y-M;O=abs(O);if(DOF.y<0.2) O=0.0;float P=clamp((O*DOF.x),0.0,5.0);if(DOF.x<=0.0) K=texture2D(panoTex,osg_TexCoord0);else K=texture2D(panoTex,osg_TexCoord0,P);
 #endif
 #endif
-float O=i();if(bAnnotationVision>0){float P=0.0;if(O>0.0) P=0.5;I=vec4(O,(1.0-L),P,1);}if(bDepthVision>0){I=texture2D(depthTex,osg_TexCoord1.xy);float Q=(K-minRad)/J;I.g=1.0-Q;}float R;
+float Q=i();if(bAnnotationVision>0){float R=0.0;if(Q>0.0) R=0.5;K=vec4(Q,(1.0-N),R,1);}if(bDepthVision>0){K=texture2D(depthTex,osg_TexCoord1.xy);float S=(M-minRad)/L;K.g=1.0-S;}float T;
 #ifdef DPF_USE_UNIFIED
-R=texture2D(panoTex,d(osg_TexCoord1)).r;
+T=texture2D(panoTex,d(osg_TexCoord1)).r;
 #else
-R=texture2D(depthTex,osg_TexCoord1).r;
+T=texture2D(depthTex,osg_TexCoord1).r;
 #endif
-float s=1.0-R;if(s>=slopeDiscard) s=1.0;else discard;if(visibility<=0.0) discard;if(bAnnotationVision==0){float S=float(annotationHash);vec4 T=D(S);I+=(0.2*T);float U=min(dimColor.a,1.0-T.a);I=mix(I,dimColor,U);}I.a=visibility*s;gl_FragColor=I;}
+float s=1.0-T;if(s>=slopeDiscard) s=1.0;else discard;if(visibility<=0.0) discard;if(bAnnotationVision==0){float U=float(annotationHash);vec4 V=D(U);K+=(0.2*V);float W=min(dimColor.a,1.0-V.a);K=mix(K,dimColor,W);}K.a=visibility*s;gl_FragColor=K;}
 #endif
