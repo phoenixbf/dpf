@@ -8,7 +8,7 @@
 #ifdef GL_ES
 precision mediump float;precision mediump int;
 #endif
-varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;varying vec4 vVertexWorld;uniform vec3 uWorldEyePos;uniform vec3 uViewDir;uniform sampler2D panoTex;uniform sampler2D depthTex;uniform sampler2D annTex;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
+varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;varying vec4 vVertexWorld;uniform vec3 uWorldEyePos;uniform vec3 uViewDir;uniform sampler2D baseSampler;uniform sampler2D depthSampler;uniform sampler2D semanticSampler;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
 #ifdef DPF_USE_UNIFIED
 
 #define DPF_H_COLOR		0.5
@@ -31,9 +31,9 @@ attribute vec3 Normal;attribute vec3 Vertex;attribute vec2 TexCoord0;uniform mat
 g=maxRad;
 #else
 #ifdef DPF_USE_UNIFIED
-g=texture2D(panoTex,d(osg_TexCoord0)).b;
+g=texture2D(baseSampler,d(osg_TexCoord0)).b;
 #else
-g=texture2D(depthTex,osg_TexCoord1).b;
+g=texture2D(depthSampler,osg_TexCoord1).b;
 #endif
 g*=radMult;if(bInvertDM>0) g=1.0-g;if(bQuadratic>0){if(bQuadratic==1) g=sqrt(g);else g*=g;}g=mix(maxRad,minRad,g);
 #endif
@@ -41,39 +41,39 @@ return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord
 #endif
 
 #ifdef FRAGMENT_SH
-uniform float slopeDiscard;uniform float visibility;uniform vec2 DOF;uniform vec4 dimColor;uniform vec4 annActiveColor;uniform int annotationHash;float i(){
+uniform float slopeDiscard;uniform float visibility;uniform vec2 DOF;uniform vec4 dimColor;uniform vec4 annActiveColor;uniform vec4 annInactiveColor;uniform int annotationHash;float i(){
 #ifdef DPF_USE_UNIFIED
-return texture2D(panoTex,e(osg_TexCoord0)).g;
+return texture2D(baseSampler,e(osg_TexCoord0)).g;
 #else
-return texture2D(annTex,osg_TexCoord2).g;
+return texture2D(semanticSampler,osg_TexCoord2).g;
 #endif
 }float i(vec2 j){
 #ifdef DPF_USE_UNIFIED
-return texture2D(panoTex,j).g;
+return texture2D(baseSampler,j).g;
 #else
-return texture2D(annTex,j).g;
+return texture2D(semanticSampler,j).g;
 #endif
 }vec4 k(float l){float m=6.0;float n=mod(l,m);int o=int(n);float p=0.2;if(o==0) return vec4(p,p,1.0,1.0);if(o==1) return vec4(p,1.0,p,1.0);if(o==2) return vec4(1.0,p,p,1.0);if(o==3) return vec4(p,1.0,1.0,1.0);if(o==4) return vec4(1.0,1.0,p,1.0);if(o==5) return vec4(1.0,p,1.0,1.0);}vec3 q(vec3 r,float s){const vec3 t=vec3(0.2125,0.7154,0.0721);vec3 u=vec3(dot(r,t));return mix(u,r,s);}vec3 v(vec3 r,float w){return ((r-0.5)*w)+0.5;}int x(float y,vec2 j){if(y<=DPF_ANN_HASH) return 0;float z=i(j);if(z==0.0) return 0;float A=(z*255.0)*DPF_ANN_HASH;float B=floor(y);float C=floor(A);if(abs(B-C)>0.0) return 0;return 1;}vec4 D(float E){int F;float G=0.0;vec4 H=vec4(0,0,0,0);
 #ifdef DPF_USE_UNIFIED
-F=x(E,e(osg_TexCoord2));G=texture2D(annTex,e(osg_TexCoord2)).r;
+F=x(E,e(osg_TexCoord2));G=texture2D(semanticSampler,e(osg_TexCoord2)).r;
 #else
-F=x(E,osg_TexCoord2);G=texture2D(annTex,osg_TexCoord2).r;
+F=x(E,osg_TexCoord2);G=texture2D(semanticSampler,osg_TexCoord2).r;
 #endif
-float I=(0.3*sin(time*2.0));if(F==0){if(G>0.0) H+=I;return H;}float J=(sin(time*8.0)+1.0);J*=0.5;H=annActiveColor;H=mix(H*0.3,H*0.8,J);return H;}void main(void){vec4 K;float L=(maxRad-minRad)*DPF_RAD_SCALE;float M=(gl_FragCoord.z/gl_FragCoord.w);float N=M/L;
+float I=sin(time*2.0);vec4 J=(annInactiveColor+I);if(F==0){if(G>0.0) H+=(J*annInactiveColor.a);return H;}float K=(sin(time*8.0)+1.0);K*=0.5;K*=annActiveColor.a;H=(annActiveColor*K);return H;}void main(void){vec4 L;float M=(maxRad-minRad)*DPF_RAD_SCALE;float N=(gl_FragCoord.z/gl_FragCoord.w);float O=N/M;
 #ifdef DPF_USE_UNIFIED
-K=texture2D(panoTex,a(osg_TexCoord0));
+L=texture2D(baseSampler,a(osg_TexCoord0));
 #else
 #ifdef DPF_MOBILE_DEVICE
-K=texture2D(panoTex,osg_TexCoord0);
+L=texture2D(baseSampler,osg_TexCoord0);
 #else
-float O=DOF.y-M;O=abs(O);if(DOF.y<0.2) O=0.0;float P=clamp((O*DOF.x),0.0,5.0);if(DOF.x<=0.0) K=texture2D(panoTex,osg_TexCoord0);else K=texture2D(panoTex,osg_TexCoord0,P);
+float P=DOF.y-N;P=abs(P);if(DOF.y<0.2) P=0.0;float Q=clamp((P*DOF.x),0.0,5.0);if(DOF.x<=0.0) L=texture2D(baseSampler,osg_TexCoord0);else L=texture2D(baseSampler,osg_TexCoord0,Q);
 #endif
 #endif
-float Q=i();if(bAnnotationVision>0){float R=0.0;if(Q>0.0) R=0.5;K=vec4(Q,(1.0-N),R,1);}if(bDepthVision>0){K=texture2D(depthTex,osg_TexCoord1.xy);float S=(M-minRad)/L;K.g=1.0-S;}float T;
+float R=i();if(bAnnotationVision>0){float S=0.0;if(R>0.0) S=0.5;L=vec4(R,(1.0-O),S,1);}if(bDepthVision>0){L=texture2D(depthSampler,osg_TexCoord1.xy);float T=(N-minRad)/M;L.g=1.0-T;}float U;
 #ifdef DPF_USE_UNIFIED
-T=texture2D(panoTex,d(osg_TexCoord1)).r;
+U=texture2D(baseSampler,d(osg_TexCoord1)).r;
 #else
-T=texture2D(depthTex,osg_TexCoord1).r;
+U=texture2D(depthSampler,osg_TexCoord1).r;
 #endif
-float s=1.0-T;if(s>=slopeDiscard) s=1.0;else discard;if(visibility<=0.0) discard;if(bAnnotationVision==0){float U=float(annotationHash);vec4 V=D(U);K+=(0.2*V);float W=min(dimColor.a,1.0-V.a);K=mix(K,dimColor,W);}K.a=visibility*s;gl_FragColor=K;}
+float s=1.0-U;if(s>=slopeDiscard) s=1.0;else discard;if(visibility<=0.0) discard;if(bAnnotationVision==0){float V=float(annotationHash);vec4 W=D(V);L+=(0.2*W);float X=min(dimColor.a,1.0-W.a);L=mix(L,dimColor,X);}L.a=visibility*s;gl_FragColor=L;}
 #endif
