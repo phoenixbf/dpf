@@ -8,7 +8,7 @@
 #ifdef GL_ES
 precision mediump float;precision mediump int;
 #endif
-varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;varying vec4 vVertexWorld;uniform vec3 uWorldEyePos;uniform vec3 uViewDir;uniform sampler2D baseSampler;uniform sampler2D depthSampler;uniform sampler2D semanticSampler;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
+varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;varying vec4 vVertexWorld;uniform vec3 uWorldEyePos;uniform vec3 uViewDir;uniform vec2 uCanvasRes;uniform vec2 uFocusPos;uniform sampler2D baseSampler;uniform sampler2D depthSampler;uniform sampler2D semanticSampler;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
 #ifdef DPF_USE_UNIFIED
 
 #define DPF_H_COLOR		0.5
@@ -75,5 +75,9 @@ U=texture2D(baseSampler,d(osg_TexCoord1)).r;
 #else
 U=texture2D(depthSampler,osg_TexCoord1).r;
 #endif
-float s=1.0-U;if(s>=slopeDiscard) s=1.0;else discard;if(visibility<=0.0) discard;if(bAnnotationVision==0){float V=float(annotationHash);vec4 W=D(V);L+=(0.2*W);float X=min(dimColor.a,1.0-W.a);L=mix(L,dimColor,X);}L.a=visibility*s;gl_FragColor=L;}
+float s=1.0-U;if(s>=slopeDiscard) s=1.0;else discard;if(visibility<=0.0) discard;vec4 V=vec4(0.4,0.4,0.4,0.0);if(bAnnotationVision==0){float W=float(annotationHash);vec4 X=D(W);L+=(0.2*X);float Y=min(dimColor.a,1.0-X.a);L=mix(L,dimColor,Y);if(annotationHash>0) V=X*0.5;}L.a=visibility*s;
+#ifndef DPF_MOBILE_DEVICE
+V+=L;vec2 Z=vec2(uFocusPos.x*uCanvasRes.x,uFocusPos.y*uCanvasRes.y);float ba=distance(gl_FragCoord.xy,Z);float bb=100.0/N;ba=clamp(ba,0.0,bb)/bb;ba*=ba;L=mix(V,L,ba);
+#endif
+gl_FragColor=L;}
 #endif
