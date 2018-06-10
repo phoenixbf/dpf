@@ -1,83 +1,417 @@
+/*	
+    DPF Vertex and Fragment Shaders
+
+	bruno.fanini@gmail.com
+
+===============================================================================
+    COMMON
+===============================================================================*/
+
+//#define DPF_MOBILE_DEVICE 1
 
 #define DPF_ANN_HASH	0.3 //0.3
 
 #define DPF_RAD_SCALE	100.0
-
 #define DPF_ANN_H		128.0
 
 #ifdef GL_ES
-precision mediump float;precision mediump int;
+precision mediump float;
+precision mediump int;
 #endif
-varying vec2 osg_TexCoord0,osg_TexCoord1,osg_TexCoord2;varying vec3 osg_FragVertex;varying vec3 vVertexWorld;uniform vec3 uWorldEyePos;uniform vec3 uQueryDir;uniform vec3 uFocusPos;uniform sampler2D baseSampler;uniform sampler2D depthSampler;uniform sampler2D semanticSampler;uniform float time;uniform float minRad;uniform float maxRad;uniform int bActive;uniform int bQuadratic;uniform int bInvertDM;uniform int bUseComboUnit;uniform int bAnnotationVision;uniform int bDepthVision;
+
+
+varying vec2 osg_TexCoord0, osg_TexCoord1, osg_TexCoord2;
+varying vec3 osg_FragVertex;
+varying vec3 vVertexWorld;
+
+uniform vec3 uWorldEyePos;
+uniform vec3 uQueryDir;
+
+//uniform vec2 uCanvasRes;
+uniform vec3 uFocusPos; // px,py, 3Dmode (1.0 = enabled)
+
+uniform sampler2D baseSampler;          // 0
+uniform sampler2D depthSampler;         // 1
+uniform sampler2D semanticSampler;      // 2
+
+uniform float time;
+
+uniform float minRad;
+uniform float maxRad;
+
+// bool
+uniform int bActive;
+uniform int bQuadratic;
+uniform int bInvertDM;
+uniform int bUseComboUnit;
+uniform int bAnnotationVision;
+uniform int bDepthVision;
+
+
+// Use Offset (Combo pano single unit)
 #ifdef DPF_USE_UNIFIED
 
-#define DPF_H_COLOR		0.5
+    #define DPF_H_COLOR		0.5
+    #define DPF_H_DEPTH		0.125
+    #define DPF_H_ANN		0.375
 
-#define DPF_H_DEPTH		0.125
+    #define DPF_OFFS_COLOR	0.0     // 0.5
+    #define DPF_OFFS_DEPTH	0.875   // 0.0
+    #define DPF_OFFS_ANN	0.5     // 0.125
 
-#define DPF_H_ANN		0.375
+    vec2 mapColorUV(vec2 tc){
+        vec2 r;
+        r.x = tc.x;
+        r.y = (tc.y * DPF_H_COLOR) + DPF_OFFS_COLOR;
+        return r;
+    }
+    vec2 mapDepthUV(vec2 tc){
+        vec2 r;
+        r.x = tc.x;
+        r.y = (tc.y * DPF_H_DEPTH) + DPF_OFFS_DEPTH;
+        return r;
+    }
+    vec2 mapAnnUV(vec2 tc){
+        vec2 r;
+        r.x = tc.x;
+        r.y = (tc.y * DPF_H_ANN) + DPF_OFFS_ANN;
+        return r;
+    }
 
-#define DPF_OFFS_COLOR	0.0     // 0.5
-
-#define DPF_OFFS_DEPTH	0.875   // 0.0
-
-#define DPF_OFFS_ANN	0.5     // 0.125
-vec2 a(vec2 b){vec2 c;c.x=b.x;c.y=(b.y*DPF_H_COLOR)+DPF_OFFS_COLOR;return c;}vec2 d(vec2 b){vec2 c;c.x=b.x;c.y=(b.y*DPF_H_DEPTH)+DPF_OFFS_DEPTH;return c;}vec2 e(vec2 b){vec2 c;c.x=b.x;c.y=(b.y*DPF_H_ANN)+DPF_OFFS_ANN;return c;}
 #endif
 
+// From https://www.shadertoy.com/view/XsfGDn
+/*
+vec2 filteredUV(vec2 uv, float textureResolution){
+	vec2 UV = (uv*textureResolution) + 0.5;
+	vec2 iuv = floor( UV );
+	vec2 fuv = fract( UV );
+	UV = iuv + fuv*fuv*(3.0-2.0*fuv); // fuv*fuv*fuv*(fuv*(fuv*6.0-15.0)+10.0);
+	UV = (UV - 0.5)/textureResolution;
+	//UV.y = (UV - 0.5)/textureResolution.y;
+
+	return UV;
+	//return texture2D( isampler, uv );
+}
+*/
+
+
+/*===============================================================================
+    VERTEX Shader
+===============================================================================*/
 #ifdef VERTEX_SH
-attribute vec3 Normal;attribute vec3 Vertex;attribute vec2 TexCoord0;uniform mat3 uModelViewNormalMatrix;uniform mat4 uProjectionMatrix;uniform mat4 uModelViewMatrix;uniform mat4 uModelMatrix;uniform float radMult;float f(){float g;
+attribute vec3 Normal;
+attribute vec3 Vertex;
+
+attribute vec2 TexCoord0;
+//attribute vec2 TexCoord1;
+
+uniform mat3 uModelViewNormalMatrix;
+uniform mat4 uProjectionMatrix;
+uniform mat4 uModelViewMatrix;
+uniform mat4 uModelMatrix;
+
+uniform float radMult;
+
+float getDepth(){
+    float d;
+
+	// Note: GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS doesnt allow texfetch on mobile VS
+	//d = 1.0;
 #ifdef DPF_MOBILE_DEVICE
-g=maxRad;
+    d = maxRad;
 #else
+
 #ifdef DPF_USE_UNIFIED
-g=texture2D(baseSampler,d(osg_TexCoord0)).b;
+    d = texture2D(baseSampler, mapDepthUV(osg_TexCoord0)).b;
 #else
-g=texture2D(depthSampler,osg_TexCoord1).b;
-#endif
-g*=radMult;if(bInvertDM>0) g=1.0-g;if(bQuadratic>0){if(bQuadratic==1) g=sqrt(g);else g*=g;}g=mix(maxRad,minRad,g);
-#endif
-return g;}void main(){osg_FragVertex=Vertex;osg_TexCoord0=TexCoord0;osg_TexCoord1=TexCoord0;osg_TexCoord2=TexCoord0;vec3 h=normalize(Normal);vec4 i=vec4((h*f()),1.0);h=uModelViewNormalMatrix*Normal;vVertexWorld=vec3(uModelMatrix*i);gl_Position=uProjectionMatrix*(uModelViewMatrix*i);}
+    d = texture2D(depthSampler, osg_TexCoord1).b;
 #endif
 
+    d *= radMult;
+    
+/*
+    if (bInvertDM>0) d = 1.0 - d;
+    if (bQuadratic>0){
+        if (bQuadratic==1) d = sqrt(d);
+        else d *= d;
+        }
+*/
+    d = sqrt(d);
+
+    d = mix(maxRad,minRad, d);
+#endif
+
+    return d;
+}
+
+
+void main(){
+    osg_FragVertex = Vertex;
+    osg_TexCoord0 = TexCoord0;
+    osg_TexCoord1 = TexCoord0;
+    osg_TexCoord2 = TexCoord0;
+    
+    vec3 normal = normalize(Normal);
+    
+    //vVertexWorld = Vertex;
+    //vVertexWorld = vec3(uModelMatrix * vec4(Vertex, 1.0));
+    vec4 vVertex = vec4((normal * getDepth()), 1.0);
+    normal = uModelViewNormalMatrix * Normal;
+
+    vVertexWorld = vec3(uModelMatrix * vVertex);
+
+    gl_Position = uProjectionMatrix * (uModelViewMatrix * vVertex ); //* vVertexWorld;
+}
+#endif
+
+
+
+
+/*===============================================================================
+    FRAGMENT Shader
+===============================================================================*/
 #ifdef FRAGMENT_SH
-uniform float slopeDiscard;uniform float visibility;uniform vec2 DOF;uniform vec4 dimColor;uniform vec4 annActiveColor;uniform vec4 annInactiveColor;uniform int annotationHash;float j(){
+
+uniform float slopeDiscard;
+//uniform vec3 camPos;
+//uniform vec3 panoPos;
+
+uniform float visibility;
+uniform vec2 DOF;           // (weight, dist)
+uniform vec4 dimColor;
+
+uniform vec4 annActiveColor;
+uniform vec4 annInactiveColor;
+
+//uniform vec2 vCanvasSize;
+
+uniform int annotationHash; // highlighted annotation hash
+
+
+
+float getAnnotationNormalizedValue(){
 #ifdef DPF_USE_UNIFIED
-return texture2D(baseSampler,e(osg_TexCoord0)).g;
+    return texture2D(baseSampler, mapAnnUV(osg_TexCoord0)).g;
 #else
-return texture2D(semanticSampler,osg_TexCoord2).g;
+    return texture2D(semanticSampler, osg_TexCoord2).g;
 #endif
-}float j(vec2 k){
+}
+
+float getAnnotationNormalizedValue(vec2 coords){
 #ifdef DPF_USE_UNIFIED
-return texture2D(baseSampler,k).g;
+    return texture2D(baseSampler,coords).g;
 #else
-return texture2D(semanticSampler,k).g;
+    return texture2D(semanticSampler,coords).g;
 #endif
-}vec4 l(float m){float n=6.0;float o=mod(m,n);int p=int(o);float q=0.2;if(p==0) return vec4(q,q,1.0,1.0);if(p==1) return vec4(q,1.0,q,1.0);if(p==2) return vec4(1.0,q,q,1.0);if(p==3) return vec4(q,1.0,1.0,1.0);if(p==4) return vec4(1.0,1.0,q,1.0);if(p==5) return vec4(1.0,q,1.0,1.0);}vec3 r(vec3 s,float t){const vec3 u=vec3(0.2125,0.7154,0.0721);vec3 v=vec3(dot(s,u));return mix(v,s,t);}vec3 w(vec3 s,float x){return ((s-0.5)*x)+0.5;}int y(float z,vec2 k){if(z<=DPF_ANN_HASH) return 0;float A=j(k);if(A==0.0) return 0;float B=(A*255.0)*DPF_ANN_HASH;float C=floor(z);float D=floor(B);if(abs(C-D)>0.0) return 0;return 1;}vec4 E(float F){int G;float H=0.0;vec4 I=vec4(0,0,0,0);
+}
+
+/*
+vec4 hashColor(float m){
+    float n=6.0;
+    float o=mod(m,n);
+    int p=int(o);
+    float q=0.2;
+    if (p==0) return vec4(q,q,1.0,1.0);
+    if (p==1) return vec4(q,1.0,q,1.0);
+    if (p==2) return vec4(1.0,q,q,1.0);
+    if (p==3) return vec4(q,1.0,1.0,1.0);
+    if (p==4) return vec4(1.0,1.0,q,1.0);
+    if (p==5) return vec4(1.0,q,1.0,1.0);
+}
+
+
+vec3 colSaturate(vec3 rgb, float t){
+    const vec3 u = vec3(0.2125,0.7154,0.0721);
+    vec3 v = vec3(dot(rgb,u));
+    return mix(v,rgb, t);
+}
+
+vec3 colContrast(vec3 rgb,float x){
+    return ((rgb-0.5)*x) + 0.5;
+}
+*/
+
+//
+int maskAnnotation(float hashedvalue, vec2 coords){
+	if (hashedvalue <= DPF_ANN_HASH) return 0;
+
+	float baseAnn  = getAnnotationNormalizedValue(coords);
+	if (baseAnn == 0.0) return 0;
+
+	float baseHash = (baseAnn * 255.0) * DPF_ANN_HASH;
+
+	float A = floor(hashedvalue);
+	float B = floor(baseHash);
+
+	if ( abs(A-B) > 0.0) return 0;
+
+	return 1;
+}
+
+vec4 AnnotationColor(float hashedint){
+//vec4 E(float m){
+    int b;
+    float aV = 0.0;
+    vec4 C = vec4(0,0,0,0);
+    
 #ifdef DPF_USE_UNIFIED
-G=y(F,e(osg_TexCoord2));H=texture2D(semanticSampler,e(osg_TexCoord2)).r;
+    b = maskAnnotation(hashedint, mapAnnUV(osg_TexCoord2));
+    aV = texture2D(semanticSampler, mapAnnUV(osg_TexCoord2)).r;
 #else
-G=y(F,osg_TexCoord2);H=texture2D(semanticSampler,osg_TexCoord2).r;
+    b = maskAnnotation(hashedint, osg_TexCoord2);
+    aV = texture2D(semanticSampler, osg_TexCoord2).r;
 #endif
-float J=sin(time*2.0);vec4 K=(annInactiveColor+J);if(G==0){if(H>0.0) I+=(K*annInactiveColor.a);return I;}float L=(sin(time*8.0)+1.0);L*=0.5;L*=annActiveColor.a;I=(annActiveColor*L);return I;}void main(void){vec4 M;float N=(maxRad-minRad)*DPF_RAD_SCALE;float O=(gl_FragCoord.z/gl_FragCoord.w);float P=O/N;
+
+    //float aT = (0.3 * sin(time*2.0));
+    float aInactivePeriod = sin(time*2.0);
+    vec4 aIC = (annInactiveColor + aInactivePeriod);
+
+    if ( b == 0 ){
+        if (aV > 0.0) C += (aIC * annInactiveColor.a); // weight
+        
+        return C; // No annotation
+        }
+    
+    float f = (sin(time*8.0) + 1.0);
+    f *= 0.5;
+
+    f *= annActiveColor.a; // weight
+
+    //C = mix(vec4(0,1,0, 1), vec4(0,0,1, 1), f);
+    C = (annActiveColor * f); //hashColor(hashedint);
+
+    //C = mix(C*0.3, C*0.8, f);
+    return C;
+}
+
+
+
+// MAIN
+//==================
+void main(void){
+    vec4 col;
+
+    float dRange = (maxRad-minRad)*DPF_RAD_SCALE;
+    float dFrag  = (gl_FragCoord.z/gl_FragCoord.w);
+    float D      = dFrag/dRange;
+
 #ifdef DPF_USE_UNIFIED
-M=texture2D(baseSampler,a(osg_TexCoord0));
+    col = texture2D(baseSampler, mapColorUV(osg_TexCoord0) );
 #else
 #ifdef DPF_MOBILE_DEVICE
-M=texture2D(baseSampler,osg_TexCoord0);
+    col = texture2D(baseSampler,osg_TexCoord0);
 #else
-float Q=DOF.y-O;Q=abs(Q);if(DOF.y<0.2) Q=0.0;float R=clamp((Q*DOF.x),0.0,5.0);if(DOF.x<=0.0) M=texture2D(baseSampler,osg_TexCoord0);else M=texture2D(baseSampler,osg_TexCoord0,R);
+    float dofDD = DOF.y - dFrag;
+    dofDD = abs(dofDD);
+    if (DOF.y < 0.2) dofDD=0.0;
+
+    float dofV = clamp((dofDD*DOF.x), 0.0, 5.0);
+
+    if (DOF.x <= 0.0) col = texture2D(baseSampler,osg_TexCoord0);
+    else col = texture2D(baseSampler, osg_TexCoord0, dofV);
 #endif
+
 #endif
-float S=j();if(bAnnotationVision>0){float T=0.0;if(S>0.0) T=0.5;M=vec4(S,(1.0-P),T,1);}if(bDepthVision>0){M=texture2D(depthSampler,osg_TexCoord1.xy);float U=(O-minRad)/N;M.g=1.0-U;}float V;
+
+    float aN = getAnnotationNormalizedValue();
+
+    if(bAnnotationVision>0){
+        float aB = 0.0;
+        if(aN>0.0) aB = 0.5;
+
+        col = vec4(aN, (1.0-D), aB, 1);
+        }
+        
+    if(bDepthVision>0){
+        col = texture2D(depthSampler, osg_TexCoord1.xy);
+
+        float dd = (dFrag-minRad)/dRange;
+        col.g = 1.0-dd;
+        }
+    
+    float s;
+
 #ifdef DPF_USE_UNIFIED
-V=texture2D(baseSampler,d(osg_TexCoord1)).r;
+    s = texture2D(baseSampler, mapDepthUV(osg_TexCoord1)).r;
 #else
-V=texture2D(depthSampler,osg_TexCoord1).r;
+    s = texture2D(depthSampler, osg_TexCoord1).r;
 #endif
-float t=1.0-V;if(t>=slopeDiscard) t=1.0;else discard;if(visibility<=0.0) discard;vec4 W=vec4(0.2,0.2,0.2,0.0);if(bAnnotationVision==0){float X=float(annotationHash);vec4 Y=E(X);M+=(0.2*Y);float Z=min(dimColor.a,1.0-Y.a);M=mix(M,dimColor,Z);if(annotationHash>0) W=Y*0.5;W+=M;if(uFocusPos.z>0.0){vec3 ba=normalize(uWorldEyePos-vVertexWorld);float bb=abs(dot(ba,uQueryDir));float bc=0.002/O;float bd=smoothstep(1.0-bc,1.0,bb);M=mix(M,W,bd);}else{
+
+    float t = 1.0-s;
+    //t *= t;
+
+    if (t >= slopeDiscard) t = 1.0;
+    //else t += (1.0-slopeDiscard);
+    else discard;
+
+    if (visibility<=0.0) discard;
+   
+
+    //=============================== Highlight Annotation pass
+    vec4 focCol = vec4(0.2,0.2,0.2, 0.0);
+
+    if(bAnnotationVision==0){
+        float h = float(annotationHash);
+        vec4 annCol = AnnotationColor(h);
+
+        col += (0.2 * annCol);
+
+        float T = min(dimColor.a, 1.0-annCol.a);
+
+        col = mix(col,dimColor, T);
+
+        if (annotationHash > 0) focCol = annCol*0.5;
+
+
+        //=========================== Pointer pass
+        focCol += col;
+
+        if (uFocusPos.z > 0.0){
+            vec3 vv = normalize(uWorldEyePos - vVertexWorld);
+            float pArea = abs(dot(vv,uQueryDir));
+            float discSize = 0.002 / dFrag; //(dFrag * dFrag);
+
+            float pT = smoothstep(1.0-discSize,1.0, pArea);
+
+            col = mix(col, focCol, pT);
+            } 
 #ifndef DPF_MOBILE_DEVICE 
-float be=distance(gl_FragCoord.xy,uFocusPos.xy);float bf=100.0/O;be=clamp(be,0.0,bf)/bf;be*=be;M=mix(W,M,be);
+        else {
+
+            float dFoc = distance(gl_FragCoord.xy, uFocusPos.xy);
+            float rT = 100.0 / dFrag; // disc size
+
+            dFoc = clamp(dFoc, 0.0, rT) / rT;
+            dFoc *= dFoc;
+            col = mix(focCol, col, dFoc );
+
+            }
 #endif
-}M.a=visibility*t;}gl_FragColor=M;}
+
+        //=========================== Alpha pass
+        //t = clamp(t, 0.0,1.0);
+        col.a = visibility * t; // mix(0.0,t, visibility);
+        }
+
+
+/*
+#ifndef DPF_MOBILE_DEVICE
+    focCol += col;
+
+    vec2 foc2D = vec2(uFocusPos.x * uCanvasRes.x, uFocusPos.y * uCanvasRes.y);
+
+    float dFoc = distance(gl_FragCoord.xy, foc2D);
+    
+    float rT = 100.0 / dFrag; // disc size
+
+    dFoc = clamp(dFoc, 0.0, rT) / rT;
+    dFoc *= dFoc;
+    col = mix(focCol, col, dFoc );
+#endif
+*/
+
+    // Finalize
+    gl_FragColor = col;
+}
 #endif
