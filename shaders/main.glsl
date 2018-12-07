@@ -15,7 +15,7 @@
 #define DPF_ANN_H		128.0
 
 #ifdef GL_ES
-precision mediump float;
+precision highp float; // mediump
 precision mediump int;
 #endif
 
