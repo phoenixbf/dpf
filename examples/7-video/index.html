@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+<title>DPF Example</title>
+<link rel="stylesheet" type="text/css" href="../../css/dpf.css">
+
+<script type="text/javascript" src="../../vendors/jquery.min.js"></script>
+<script type="text/javascript" src="../../vendors/bluebird.min.js"></script>
+<script type="text/javascript" src="../../vendors/hammer.min.js"></script>
+<script type="text/javascript" src="../../vendors/OSG.min.js"></script>
+<script type="text/javascript" src="../../dist/DPF.min.js"></script>
+
+<!--  Our basic setup  -->
+<script>
+var myExplorer = undefined;
+
+    window.addEventListener( 'load', function () {
+        // First we grab canvas element
+        var canvas = document.getElementById( 'View' );
+
+        // We create a DPF explorer and attach to our canvas
+        myExplorer = new DPFhandler( canvas );
+        myExplorer.loadShadersFromPath("../../shaders", { useUnifiedLayout: true});
+
+        var myDPF = new DPF("../common/_vidstreams/combo2.mp4");
+        myDPF.setDepthRange(0.2,17.47);
+        myDPF.setDepthMultiplier(0.2);
+
+        myExplorer.addDPF( myDPF );
+
+        //========================================================
+        // We define our annotation events handling
+        //========================================================
+
+        // First, grab element that we'll modify
+        var annotationElement = document.getElementById( 'annID' );
+
+        // A simple function to change our text in such element
+        var setText = function(text){ annotationElement.innerHTML = text; };
+
+        // A sample sound we intend to play on hover
+        var hoverAudio  = new Audio("../common/samples/audio/click.ogg");
+        hoverAudio.loop = false;
+        var playHoverSound = function(){ hoverAudio.play(); };
+
+
+        // This is called whenever we hover a new annotation ID.
+        // Very useful to define a generic event (e.g. sound) on ANY annotation hover
+        myExplorer.onHoverAnnotation = function(){
+            var aID = this.getHoveredAnnotationID();
+            console.log(aID);
+
+            playHoverSound();   // play hover sound
+
+            //setText("Annotation #"+aID);
+            console.log("Hovering annotation #" + aID);
+            };
+
+        // ...and when we leave
+        myExplorer.onLeaveAnnotation = function(){
+
+            setText("");
+            console.log("No annotation hovered");
+            };
+
+        // 
+        myDPF.onHoverAnnotation(72, function(){ setText("Acquisition locations"); });
+        myDPF.onHoverAnnotation(38, function(){ setText("Niches"); });
+
+        // We set a FOV
+        myExplorer.setFOV(70.0);
+
+        // OK Let's go !!
+        myExplorer.run();
+        });
+</script>
+</head>
+
+
+<body class="dark-bg">
+
+	<!-- Our 3D View -->
+	<div id="ViewContainer" class="view3D">
+	<canvas id="View" oncontextmenu="return false;"></canvas>
+	</div>
+
+    <!--  Bottom description  -->
+    <div class="infoContainer">
+        <div class="description" >
+        <div class="title"><span id="annID"></span> | DPF Videostream</div>
+        <div class="sampleText">
+        This is a sample DPF Videostream (or 'Temporal DPF') using unified layout. You can play/pause current DPF videostream using this button: <button type="button" onclick="myExplorer._activeDPF.playOrPauseVideoStreams()">PLAY / PAUSE</button>
+        </div>
+        </div>
+    </div>
+
+</body>
+</html>
