@@ -18,6 +18,10 @@ body {
     font-family: sans-serif;
     font-size: 14px;
     font-family: Tahoma, Verdana, Geneva;
+
+    touch-action: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 a {
