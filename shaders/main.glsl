@@ -15,7 +15,7 @@
 #define DPF_ANN_H		128.0
 
 #ifdef GL_ES
-precision highp float; // mediump
+precision mediump float; // mediump
 precision mediump int;
 #endif
 
@@ -116,11 +116,10 @@ uniform float radMult;
 float getDepth(){
     float d;
 
-	// Note: GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS doesnt allow texfetch on mobile VS
-	//d = 1.0;
-#ifdef DPF_MOBILE_DEVICE
-    d = maxRad;
-#else
+// Note: GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS doesnt allow texfetch on mobile VS
+//#ifdef DPF_MOBILE_DEVICE
+//    d = maxRad;
+//#else
 
 #ifdef DPF_USE_UNIFIED
     d = texture2D(baseSampler, mapDepthUV(osg_TexCoord0)).b;
@@ -140,7 +139,7 @@ float getDepth(){
     d = sqrt(d);
 
     d = mix(maxRad,minRad, d);
-#endif
+//#endif
 
     return d;
 }
@@ -338,6 +337,8 @@ void main(void){
     s = texture2D(depthSampler, osg_TexCoord1).r;
 #endif
 
+
+#if 0
     float t = 1.0-s;
     //t *= t;
 
@@ -346,7 +347,7 @@ void main(void){
     else discard;
 
     if (visibility<=0.0) discard;
-   
+#endif
 
     //=============================== Highlight Annotation pass
     vec4 focCol = vec4(0.2,0.2,0.2, 0.0);
@@ -391,7 +392,9 @@ void main(void){
 
         //=========================== Alpha pass
         //t = clamp(t, 0.0,1.0);
-        col.a = visibility * t; // mix(0.0,t, visibility);
+        
+        
+        col.a = visibility; // * t; /// mix(0.0,t, visibility);
         }
 
 
