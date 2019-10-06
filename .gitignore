@@ -1,2 +1,5 @@
 APP
 /examples/common/_vidstreams
+
+/build-*
+/node_modules
