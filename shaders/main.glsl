@@ -14,9 +14,9 @@
 #define DPF_RAD_SCALE	100.0
 #define DPF_ANN_H		128.0
 
-#ifdef GL_ES
-precision mediump float; // mediump
-precision mediump int;
+#ifdef GL_ES // mediump
+precision highp float;
+precision highp int;
 #endif
 
 
