@@ -1275,7 +1275,7 @@ var DPFhandler = function(canvas, viewer){
 	this.onTransitionEnded   = undefined;
 
 	// Insight
-	this._createInsightPointer();
+	this.createInsightPointer(0.1, [0.5,2.0,0.5, 1.0] );
 
 	this.onTick = undefined;
 
@@ -1942,13 +1942,13 @@ _update3Dpointer: function(){
 },
 
 // Insight Pointer. TODO: move to each DPF?
-_createInsightPointer: function(){
-	this._insightModel = osg.createTexturedSphere(0.2, 15,15); // 0.2
+createInsightPointer: function(radius, color){
+	this._insightModel = osg.createTexturedSphere(radius, 15,15); // 0.2
 
 	var material = new osg.Material();
 	//material.setTransparency( 0.5 );
 	//material.setDiffuse( [0,1,0, 1.0] );
-	material.setDiffuse( [0.5,2.0,0.5, 1.0] ); // this is multiplied w/ texture
+	material.setDiffuse( color ); // this is multiplied w/ texture
 
 	this._insightModel.getOrCreateStateSet().setAttributeAndModes( material );
 	this._insightModel.getOrCreateStateSet().setTextureAttributeAndModes( 0, DPFutils.fallbackWhiteTex);
