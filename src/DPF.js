@@ -1403,7 +1403,7 @@ run: function(){
 		this._viewer = new osgViewer.Viewer( this._canvas, {
 			'antialias': true, // true fixes VR issues
 			//'stats': true,
-			//'overrideDevicePixelRatio': 1, // if specified override the device pixel ratio
+			'overrideDevicePixelRatio': 2, // if specified override the device pixel ratio
 			//'enableFrustumCulling': false,
 			'alpha': true,
 			//'scrollwheel': false,
