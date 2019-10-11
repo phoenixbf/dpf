@@ -38,7 +38,7 @@ var InputGroups = OSG.osgViewer.InputGroups;
 
 
 // NB: these values must map to relative shaders defines
-const DPF_RAD_SCALE  = 100.0;
+const DPF_RAD_SCALE  = 50.0;
 const DPF_ANN_HASH   = 0.3; // 0.3 - DO NOT CHANGE
 
 // Default DPF channels (tex units)
@@ -583,7 +583,7 @@ realizeBaseSphere: function(){
 	// If base uv-sphere already created, skip
 	//if (this._baseGeom !== undefined) return;
 
-	this._baseGeom = osg.createTexturedSphere(1.0, this._baseGeomResolution, this._baseGeomResolution);
+	this._baseGeom = osg.createTexturedSphere(DPF_RAD_SCALE, this._baseGeomResolution, this._baseGeomResolution);
 
 	this._baseGeom.setCullingActive( false );
 	this._baseGeom.getOrCreateStateSet().setAttributeAndModes( new osg.CullFace( 'DISABLE' ) ); // CHECK
