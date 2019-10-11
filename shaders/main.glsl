@@ -11,7 +11,7 @@
 
 #define DPF_ANN_HASH	0.3 //0.3
 
-#define DPF_RAD_SCALE	100.0
+//#define DPF_RAD_SCALE	100.0
 #define DPF_ANN_H		128.0
 
 #ifdef GL_ES // mediump
@@ -291,7 +291,7 @@ vec4 AnnotationColor(float hashedint){
 void main(void){
     vec4 col;
 
-    float dRange = (maxRad-minRad)*DPF_RAD_SCALE;
+    float dRange = (maxRad-minRad); //*DPF_RAD_SCALE;
     float dFrag  = (gl_FragCoord.z/gl_FragCoord.w);
     float D      = dFrag/dRange;
 

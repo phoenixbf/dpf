@@ -193,7 +193,7 @@ var DPF = function(panourl, depthurl, annurl){
 
 	//this._shadersPath = "";
 
-	this._depthRange = { min: 0.0, max: (1.0/DPF_RAD_SCALE) };
+	this._depthRange = { min: 0.0, max: 1.0 };
 	this.setDepthRange(20.0, 20.0); // Defaults to constant 20 meters
 
 	this._baseGeom = undefined;
@@ -377,8 +377,8 @@ getTransNode: function(){
  * @param {float} max - max distance
  */
 setDepthRange: function( min, max ){
-	this._depthRange.min = min/DPF_RAD_SCALE;
-	this._depthRange.max = max/DPF_RAD_SCALE;
+	this._depthRange.min = min; ///DPF_RAD_SCALE;
+	this._depthRange.max = max; ///DPF_RAD_SCALE;
 
 	this._mainTrans.getOrCreateStateSet().getUniform('minRad').setFloat( this._depthRange.min );
 	this._mainTrans.getOrCreateStateSet().getUniform('maxRad').setFloat( this._depthRange.max );
@@ -407,9 +407,12 @@ setDepthRange: function( min, max ){
  * @returns {vec2}
  */
 getDepthRange: function(){
+/*	
 	var dr = [ 	(this._depthRange.min * DPF_RAD_SCALE),
 				(this._depthRange.max * DPF_RAD_SCALE) ];
 	return dr;
+*/
+	return [this._depthRange.min,this._depthRange.max];
 },
 
 /**
@@ -429,8 +432,8 @@ getDepthMultiplier: function(){
 },
 
 getDepthErrorAtDistance: function(d){
-	var dMin = this._depthRange.min * DPF_RAD_SCALE;
-	var dMax = this._depthRange.max * DPF_RAD_SCALE;
+	var dMin = this._depthRange.min; //* DPF_RAD_SCALE;
+	var dMax = this._depthRange.max; //* DPF_RAD_SCALE;
 
 	if (d <= dMin) return 0.0;
 	if (d > dMax)  return this._dErr;
@@ -519,7 +522,7 @@ initUniforms: function(){
 
 
 	tSS.addUniform( osg.Uniform.createFloat1( 0.0, 'minRad' ));
-	tSS.addUniform( osg.Uniform.createFloat1( (1.0/DPF_RAD_SCALE), 'maxRad' ));
+	tSS.addUniform( osg.Uniform.createFloat1( 1.0 /*(1.0/DPF_RAD_SCALE)*/, 'maxRad' ));
 
 	tSS.addUniform( osg.Uniform.createFloat1( 1.0, 'radMult' ));
 	tSS.addUniform( osg.Uniform.createFloat1( 1.0, 'visibility' ));
@@ -554,9 +557,9 @@ updateMatrixTransform: function(){
 
 	// Scale
     var S = osg.mat4.create();
-    //$osg.Matrix.makeScale( DPF_RAD_SCALE,DPF_RAD_SCALE,DPF_RAD_SCALE, S );
-	//osg.mat4.scale(S, S, [DPF_RAD_SCALE,DPF_RAD_SCALE,DPF_RAD_SCALE]);
-	osg.mat4.fromScaling( S, [DPF_RAD_SCALE,DPF_RAD_SCALE,DPF_RAD_SCALE]);
+    ////$osg.Matrix.makeScale( DPF_RAD_SCALE,DPF_RAD_SCALE,DPF_RAD_SCALE, S );
+	///osg.mat4.scale(S, S, [DPF_RAD_SCALE,DPF_RAD_SCALE,DPF_RAD_SCALE]);
+	//osg.mat4.fromScaling( S, [DPF_RAD_SCALE,DPF_RAD_SCALE,DPF_RAD_SCALE]);
 
 	//$osg.Matrix.preMult( M, S );
 	osg.mat4.multiply(M, M,S);
