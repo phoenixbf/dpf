@@ -1217,6 +1217,7 @@ var DPFhandler = function(canvas, viewer){
 	this._useDeviceOrientation = false;
 
 	this._overrideDevicePixelRatio = 2;
+	this._pdr = Math.max(window.devicePixelRatio, this._overrideDevicePixelRatio);
 
 	if (viewer === undefined) this._viewer = undefined;
 	else this._viewer = viewer;
@@ -1735,7 +1736,7 @@ _attachListeners: function(){
 		if (thisDPFH._useDeviceOrientation || thisDPFH._vrState) return; // skip
 
 		//console.log(window.devicePixelRatio);
-		var pdr = Math.max(window.devicePixelRatio, thisDPFH._overrideDevicePixelRatio);
+		//var pdr = Math.max(window.devicePixelRatio, thisDPFH._overrideDevicePixelRatio);
 
 		var mx = evt.clientX * ( thisDPFH._canvas.width / thisDPFH._canvas.clientWidth );
 		var my = ( thisDPFH._canvas.clientHeight - evt.clientY ) * ( thisDPFH._canvas.height / thisDPFH._canvas.clientHeight );
@@ -1749,8 +1750,8 @@ _attachListeners: function(){
 		thisDPFH._annXYquery[1] = my;
 
 		thisDPFH._ssGlobal.getUniform('uFocusPos').setFloat3([
-			evt.clientX * pdr, 
-			thisDPFH._canvas.height - (evt.clientY * pdr), 
+			evt.clientX * thisDPFH._pdr, 
+			thisDPFH._canvas.height - (evt.clientY * thisDPFH._pdr), 
 			0.0
 			]);
 		//console.log(evt.clientX,evt.clientX);
