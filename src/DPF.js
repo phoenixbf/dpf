@@ -1735,7 +1735,7 @@ _attachListeners: function(){
 		if (thisDPFH._useDeviceOrientation || thisDPFH._vrState) return; // skip
 
 		//console.log(window.devicePixelRatio);
-		var pdr = window.devicePixelRatio * thisDPFH._overrideDevicePixelRatio;
+		var pdr = Math.max(window.devicePixelRatio, thisDPFH._overrideDevicePixelRatio);
 
 		var mx = evt.clientX * ( thisDPFH._canvas.width / thisDPFH._canvas.clientWidth );
 		var my = ( thisDPFH._canvas.clientHeight - evt.clientY ) * ( thisDPFH._canvas.height / thisDPFH._canvas.clientHeight );
