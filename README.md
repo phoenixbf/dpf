@@ -21,7 +21,7 @@ The DPF data transport and DPF Library provide:
 * [jQuery](https://jquery.com/) - jQuery
 * [Bluebird](http://bluebirdjs.com/docs/getting-started.html) - Bluebird
 * [Hammer](http://hammerjs.github.io/) - Hammer js (multi-touch support)
-* [OSG.js](http://osgjs.org/) - OSG js
+* [OSG.js](https://cedricpinson.github.io/osgjs-website/) - OSG js
 
 ## API
 
